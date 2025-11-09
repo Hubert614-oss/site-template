@@ -1,136 +1,204 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 const Accueil: React.FC = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const slides = [
-    {
-      id: 1,
-      title: "Bienvenue sur Notre Site",
-      gradient: "from-blue-500 via-purple-500 to-pink-500",
-    },
-    {
-      id: 2,
-      title: "Découvrez nos services exceptionnels et notre galerie de projets inspirants. Nous sommes là pour transformer vos idées en réalité.",
-      gradient: "from-purple-500 via-pink-500 to-red-500",
-    }
-  ];
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    // Animation au scroll pour les éléments
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
 
-    return () => clearInterval(interval);
-  }, [slides.length]);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+        }
+      });
+    }, observerOptions);
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
+    animateElements.forEach(el => observer.observe(el));
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
+    return () => observer.disconnect();
+  }, []);
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const headerHeight = 70;
+      const targetPosition = element.offsetTop - headerHeight;
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
-    <section id="accueil" className="min-h-screen pt-20 relative overflow-hidden">
-      {/* Slider Container */}
-      <div className="relative h-screen">
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <div className={`h-full w-full bg-linear-to-br ${slide.gradient} flex items-center justify-center`}>
-              <div className="container mx-auto px-6 text-center">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 animate-fade-in max-w-5xl mx-auto leading-tight">
-                  {slide.title}
-                </h1>
-                <div className="flex gap-4 justify-center mt-12">
-                  <button 
-                    onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="bg-white text-gray-800 px-8 py-4 rounded-full hover:bg-gray-100 transition duration-300 shadow-2xl font-semibold text-lg"
-                  >
-                    Contactez-nous
-                  </button>
-                  <button 
-                    onClick={() => document.getElementById('galerie')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-gray-800 transition duration-300 shadow-2xl font-semibold text-lg"
-                  >
-                    Voir la Galerie
-                  </button>
+    <>
+      {/* Section Hero / Accueil */}
+      <section 
+        id="accueil" 
+        className="min-h-screen flex items-center justify-center text-center text-white relative overflow-hidden pt-20 px-6 bg-linear-to-br from-indigo-600 via-purple-600 to-purple-700"
+      >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+            <polygon fill="white" points="0,1000 1000,0 1000,1000"/>
+          </svg>
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in">
+            Bienvenue sur MonSite
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 opacity-90 animate-fade-in-delay-1">
+            Votre partenaire de confiance pour tous vos projets
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap animate-fade-in-delay-2">
+            <button
+              onClick={() => scrollToSection('apropos')}
+              className="bg-blue-500 hover:bg-transparent border-2 border-blue-500 hover:border-white text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              Découvrir
+            </button>
+            <button
+              onClick={() => scrollToSection('contact')}
+              className="bg-transparent hover:bg-white border-2 border-white text-white hover:text-gray-800 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              Nous contacter
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Services */}
+      <section className="py-20 md:py-28 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-4">
+            Nos Services
+          </h2>
+          <div className="w-20 h-1 bg-blue-500 mx-auto mb-16 rounded"></div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            {/* Service 1 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 text-center animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+              <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fas fa-laptop-code text-white text-3xl"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Développement Web</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Création de sites web modernes et responsives adaptés à vos besoins.
+              </p>
+            </div>
+
+            {/* Service 2 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 text-center animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
+              <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fas fa-mobile-alt text-white text-3xl"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Applications Mobile</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Développement d'applications mobiles natives et cross-platform.
+              </p>
+            </div>
+
+            {/* Service 3 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 text-center animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200">
+              <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fas fa-search text-white text-3xl"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">SEO & Marketing</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Optimisation pour les moteurs de recherche et stratégies marketing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section À propos */}
+      <section id="apropos" className="py-20 md:py-28 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Texte */}
+            <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                À propos de nous
+              </h2>
+              <div className="w-20 h-1 bg-blue-500 mb-8 rounded"></div>
+              
+              <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                Nous sommes une équipe passionnée de professionnels dédiés à la création 
+                de solutions digitales innovantes. Avec plus de 5 ans d'expérience dans 
+                le domaine, nous accompagnons nos clients dans leur transformation numérique.
+              </p>
+
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3">
+                  <i className="fas fa-check-circle text-green-500 text-xl"></i>
+                  <span className="text-gray-700 font-medium">Expertise technique reconnue</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <i className="fas fa-check-circle text-green-500 text-xl"></i>
+                  <span className="text-gray-700 font-medium">Accompagnement personnalisé</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <i className="fas fa-check-circle text-green-500 text-xl"></i>
+                  <span className="text-gray-700 font-medium">Support technique 24/7</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <i className="fas fa-check-circle text-green-500 text-xl"></i>
+                  <span className="text-gray-700 font-medium">Solutions sur mesure</span>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
 
-        {/* Navigation Arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 md:left-8 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white p-3 rounded-full transition duration-300 backdrop-blur-sm"
-          aria-label="Previous slide"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 md:right-8 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white p-3 rounded-full transition duration-300 backdrop-blur-sm"
-          aria-label="Next slide"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-
-        {/* Dots Navigation */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlide 
-                  ? 'bg-white w-8' 
-                  : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Services Section */}
-      <div className="bg-white py-20">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-linear-to-br from-blue-50 to-blue-100 p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-              <div className="text-5xl mb-4">🚀</div>
-              <h3 className="text-2xl font-bold mb-3 text-gray-800">Innovation</h3>
-              <p className="text-gray-600">Des solutions modernes et innovantes pour votre entreprise</p>
+              <button
+                onClick={() => scrollToSection('contact')}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                Parlons de votre projet
+              </button>
             </div>
-            <div className="bg-linear-to-br from-purple-50 to-purple-100 p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-              <div className="text-5xl mb-4">💡</div>
-              <h3 className="text-2xl font-bold mb-3 text-gray-800">Créativité</h3>
-              <p className="text-gray-600">Des designs uniques qui captivent votre audience</p>
-            </div>
-            <div className="bg-linear-to-br from-pink-50 to-pink-100 p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-              <div className="text-5xl mb-4">⚡</div>
-              <h3 className="text-2xl font-bold mb-3 text-gray-800">Performance</h3>
-              <p className="text-gray-600">Des sites rapides et optimisés pour tous les appareils</p>
+
+            {/* Image */}
+            <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200">
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop"
+                alt="Notre équipe"
+                className="w-full h-[400px] object-cover rounded-2xl shadow-2xl"
+              />
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 1s ease;
+        }
+
+        .animate-fade-in-delay-1 {
+          animation: fade-in 1s ease 0.2s both;
+        }
+
+        .animate-fade-in-delay-2 {
+          animation: fade-in 1s ease 0.4s both;
+        }
+      `}</style>
+    </>
   );
 };
 
